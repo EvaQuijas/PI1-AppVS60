@@ -1,29 +1,70 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { AppProvider } from './context/AppContext';
+import * as Notifications from 'expo-notifications';
+import { useEffect } from 'react';
+import { Platform } from 'react-native';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+  useEffect(() => {
+    // 1. Configurar canal Android ( para segundo plano)
+    const setupAndroidChannel = async () => {
+      if (Platform.OS === 'android') {
+        await Notifications.setNotificationChannelAsync('recordatorios', {
+          name: 'Recordatorios',
+          importance: Notifications.AndroidImportance.HIGH,
+          sound: 'default',
+          vibrationPattern: [0, 250, 250, 250],
+          enableLights: true,
+          enableVibrate: true,
+          lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+          showBadge: true,
+        });
+        console.log('✅ Canal Android configurado para segundo plano');
+      }
+    };
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
+    // 2. Solicitar permisos ESPECÍFICOS para segundo plano
+    const requestPermissions = async () => {
+      try {
+       
+        const { status } = await Notifications.getPermissionsAsync();
+        console.log('📋 Permisos actuales:', status);
+        
+        if (status !== 'granted') {
+          const { status: newStatus } = await Notifications.requestPermissionsAsync();
+          console.log('📋 Nuevos permisos:', newStatus);
+        }
+        
+        await setupAndroidChannel();
+      } catch (error) {
+        console.log('❌ Error:', error);
+      }
+    }; //  CIERRA la función requestPermissions
+
+    requestPermissions();
+
+    // 3. Limpiar 
+    return () => {};
+  }, []);
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
+    <AppProvider>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    </AppProvider>
   );
 }
