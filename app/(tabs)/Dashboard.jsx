@@ -63,7 +63,8 @@ const Dashboard = () => {
         { title: 'Recordatorios', icon: '⏰', screen: '/(Reminders)', color: '#3498db' },
         { title: 'Alarmas', icon: '🔔', screen: '/(Alarmas)', color: '#9A3F3F' },
         { title: 'Llamada rápida', icon: '📞', screen: '/(EmergencyContact)', color: '#2ecc71' },
-        { title: 'Enviar ubicación', icon: '📌', screen: '/(Ubicacion)/', color: '#f39c12' }  
+        { title: 'Enviar ubicación', icon: '📌', screen: '/(Ubicacion)/', color: '#f39c12' }, 
+        { title: 'Compra', icon: '💊', screen: '/(Farmacia)', color: '#708993' },
     ];
 
     // Función para obtener recordatorios de la fecha seleccionada
