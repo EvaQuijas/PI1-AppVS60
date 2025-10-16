@@ -1,11 +1,11 @@
 import { router } from 'expo-router';
-import { useState, useEffect } from 'react'; // useState y useEffect
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { useEffect, useState } from 'react'; // useState y useEffect
 import { ScrollView } from 'react-native';
-import styled from 'styled-components/native';
-import { useApp } from '../context/AppContext';
 import { Calendar } from 'react-native-calendars';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import styled from 'styled-components/native';
 import { db } from '../config/firebase';
+import { useApp } from '../context/AppContext';
 
 const Dashboard = () => {
     const { user, logout } = useApp();
@@ -58,6 +58,7 @@ const Dashboard = () => {
     };
 
     const menuItems = [
+        { title: '🚨 EMERGENCIA', icon: '🚨', screen: '/(Emergencia)', color: '#e74c3c', priority: true },
         { title: 'Registro de salud', icon: '🤍', screen: '/(RegistroSalud)', color: '#e74c3c' },
         { title: 'Notas', icon: '📝', screen: '/(Notas)', color: '#9b59b6' },
         { title: 'Recordatorios', icon: '⏰', screen: '/(Reminders)', color: '#3498db' },
@@ -96,8 +97,25 @@ const Dashboard = () => {
             </Header>
 
             <ScrollView>
+                {/* 🚨 BOTÓN DE EMERGENCIA DESTACADO */}
+                <EmergencySection>
+                    <EmergencyCard
+                        onPress={() => router.push('/(Emergencia)')}
+                    >
+                        <EmergencyIconContainer>
+                            <EmergencyIcon>🚨</EmergencyIcon>
+                        </EmergencyIconContainer>
+                        <EmergencyContent>
+                            <EmergencyTitle>EMERGENCIA</EmergencyTitle>
+                            <EmergencySubtitle>Activar ayuda inmediata</EmergencySubtitle>
+                        </EmergencyContent>
+                        <EmergencyArrow>→</EmergencyArrow>
+                    </EmergencyCard>
+                </EmergencySection>
+
+                {/* 📱 GRID DE MÓDULOS REGULARES */}
                 <Grid>
-                    {menuItems.map((item, index) => (
+                    {menuItems.filter(item => !item.priority).map((item, index) => (
                         <MenuCard
                             key={index}
                             onPress={() => router.push(item.screen)}
@@ -334,6 +352,60 @@ const NoRemindersText = styled.Text`
   font-style: italic;
 `;
 
-// Los demás styled components se mantienen igual...
+// 🚨 Styled Components para el botón de emergencia destacado
+const EmergencySection = styled.View`
+  padding: 20px;
+  padding-bottom: 10px;
+`;
+
+const EmergencyCard = styled.TouchableOpacity`
+  background-color: #e74c3c;
+  flex-direction: row;
+  align-items: center;
+  padding: 20px;
+  border-radius: 15px;
+  shadow-color: #e74c3c;
+  shadow-offset: 0px 4px;
+  shadow-opacity: 0.3;
+  shadow-radius: 8px;
+  elevation: 8;
+`;
+
+const EmergencyIconContainer = styled.View`
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
+  background-color: rgba(255, 255, 255, 0.2);
+  justify-content: center;
+  align-items: center;
+  margin-right: 15px;
+`;
+
+const EmergencyIcon = styled.Text`
+  font-size: 30px;
+`;
+
+const EmergencyContent = styled.View`
+  flex: 1;
+`;
+
+const EmergencyTitle = styled.Text`
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 5px;
+`;
+
+const EmergencySubtitle = styled.Text`
+  color: white;
+  font-size: 14px;
+  opacity: 0.9;
+`;
+
+const EmergencyArrow = styled.Text`
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+`;
 
 export default Dashboard;

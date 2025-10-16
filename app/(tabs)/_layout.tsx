@@ -8,15 +8,6 @@ export default function TabLayout() {
         options={{
           title: 'Inicio',  
           headerShown: false 
-
-                  
-        }}
-      />
-      <Tabs.Screen
-        name="calendar"
-        options={{
-          title: 'Calendario',
-          
         }}
       />
     </Tabs>
