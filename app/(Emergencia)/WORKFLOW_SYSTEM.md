@@ -174,3 +174,4 @@ const pauseBeforeCall = 3000; // 3 segundos antes de llamada
 Este sistema resuelve completamente el problema de pantallas bloqueadas y garantiza que el flujo de emergencia funcione de manera confiable y predecible.
 
 **⚠️ IMPORTANTE**: El sistema está diseñado para ser robusto y manejar todos los casos edge, pero siempre se recomienda probar en diferentes dispositivos y escenarios.
+
