@@ -1,11 +1,11 @@
 import { router } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, TouchableOpacity } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import styled from 'styled-components/native';
 import { auth } from '../config/firebase';
 import { useApp } from '../context/AppContext';
-
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -13,11 +13,11 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const { user } = useApp();
 
-   useEffect(() => {
+  useEffect(() => {
     if (user) {
       router.replace('/(tabs)/Dashboard');
     }
-  }, [user]); // Solo se ejecuta cuando 'user' cambia
+  }, [user]);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -27,77 +27,82 @@ const Login = () => {
 
     setLoading(true);
     try {
-    // 1. Intentar login
-    await signInWithEmailAndPassword(auth, email, password);
-    
-    // 2. ✅ REDIRIGIR MANUALMENTE después de login exitoso
-    //    Esto asegura que funcione incluso si onAuthStateChanged falla
-    router.replace('/(tabs)/Dashboard');
-    
-  } catch (error) {
-    Alert.alert('Error', error.message);
-  }
-  setLoading(false);
-};
+      await signInWithEmailAndPassword(auth, email, password);
+      router.replace('/(tabs)/Dashboard');
+    } catch (error) {
+      Alert.alert('Error', error.message);
+    }
+    setLoading(false);
+  };
+
   return (
-    <Container>
-      <LogoContainer>
-        <Logo source={require('../../assets/images/icon-app.png')} />
-      </LogoContainer>
+    <KeyboardAwareScrollView
+      contentContainerStyle={{ flexGrow: 1 }}
+      enableOnAndroid={true}
+      extraHeight={100}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+    >
+      <Container>
+        <LogoContainer>
+          <Logo source={require('../../assets/images/icon-app.png')} />
+        </LogoContainer>
 
-
-      <Title>Vida Saludable 60+</Title>
-      
-      <Card>
-        <Input
-          placeholder="Correo electrónico"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          placeholderTextColor="#999"
-        />
+        <Title>Vida Saludable 60+</Title>
         
-        <Input
-          placeholder="Contraseña"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          placeholderTextColor="#999"
-        />
-        
-        <Button onPress={handleLogin} disabled={loading}>
-          <ButtonText>
-            {loading ? 'Cargando...' : 'Iniciar Sesión'}
-          </ButtonText>
-        </Button>
-        
-        <TouchableOpacity onPress={() => router.push('/(auth)/Register')}>
-          <LinkText>¿No tienes cuenta? Regístrate aquí</LinkText>
-        </TouchableOpacity>
-      </Card>
-    </Container>
+        <Card>
+          <Input
+            placeholder="Correo electrónico"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            placeholderTextColor="#999"
+          />
+          
+          <Input
+            placeholder="Contraseña"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            placeholderTextColor="#999"
+          />
+          
+          <Button onPress={handleLogin} disabled={loading}>
+            <ButtonText>
+              {loading ? 'Cargando...' : 'Iniciar Sesión'}
+            </ButtonText>
+          </Button>
+          
+          <TouchableOpacity onPress={() => router.push('/(auth)/Register')}>
+            <LinkText>¿No tienes cuenta? Regístrate aquí</LinkText>
+          </TouchableOpacity>
+        </Card>
+      </Container>
+    </KeyboardAwareScrollView>
   );
 };
 
 export default Login;
 
 // Styled Components
-
-const LogoContainer = styled.View`
-  align-items: center;
-  margin-bottom: 30px;
-`;
-const Logo = styled.Image`
-  width: 120px;
-  height: 120px;
-  border-radius: 60px;
-`;
 const Container = styled.View`
   flex: 1;
   background-color: #F7F4EA;
   justify-content: center;
   padding: 20px;
+  min-height: 100%;
+`;
+
+const LogoContainer = styled.View`
+  align-items: center;
+  margin-bottom: 30px;
+`;
+
+const Logo = styled.Image`
+  width: 120px;
+  height: 120px;
+  border-radius: 60px;
 `;
 
 const Title = styled.Text`
